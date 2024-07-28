@@ -76,3 +76,21 @@ def simulated_annealing(capacity, n, items, seed, max_iterations):
     
     return best_solution, best_value
 
+def main():
+    if len(sys.argv) < 4:
+        print("Uso: python script.py <input_file> <seed> <max_iterations>")
+        return
+    
+    input_file = sys.argv[1]
+    seed = int(sys.argv[2])
+    max_iterations = int(sys.argv[3])
+    
+    capacity, n, items = parse_input_file(input_file)
+    
+    best_solution, best_value = simulated_annealing(capacity, n, items, seed, max_iterations)
+    
+    print(f"Best Solution: {best_solution}")
+    print(f"Best Value: {best_value}")
+
+if __name__ == "__main__":
+    main()
