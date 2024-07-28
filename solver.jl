@@ -1,4 +1,4 @@
-using JuMP, HiGHS
+using JuMP, HiGHS, Dates
 
 model = Model(HiGHS.Optimizer)
 set_optimizer_attribute(model, "presolve", "on")
@@ -33,8 +33,42 @@ function read_instance(filename)
 end
 
 
-function knapsack_sharing()
-	n, G, c, group_sizes, weights, profits, groups = read_instance("/home/luis/optimization/test.txt")
+function knapsack_sharing(file)
+	n, G, c, group_sizes, weights, profits, groups = read_instance(file)
 
+	#println(n)
+	#println(G)
+	#println(c)
+	#println(group_sizes)
+	#println(weights)
+	#println(profits)
+	#println(groups)
+	
+	@variable(model, x[1:n], Bin)
+    @variable(model, z)
+
+	# Restrição da capacidade da mochila
+    @constraint(model, sum(weights[i] * x[i] for i in 1:n) <= c)
+	
+	# Faz java parecer lindo
+    group_profits = [@expression(model, sum(profits[i] * x[i] for i in 1:n if groups[i] == g)) for g in 1:G]
+    
+	for g in 1:G
+        @constraint(model, group_profits[g] >= z)
+    end
+
+	@objective(model, Max, z)
+    optimize!(model)
+
+	return objective_value(model)
 end
+
+for arg in ARGS
+	start = now()
+	result = knapsack_sharing(arg)
+	
+	println("tempo de execução: ", now() - start)
+	println("Melhor solução encontrada: ", result)
+end
+
 
