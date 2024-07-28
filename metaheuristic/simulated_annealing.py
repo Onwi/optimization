@@ -1,18 +1,24 @@
 import sys
 import random
 import time
+import math
 
 def parse_input_file(file_path):
     with open(file_path, 'r') as f:
-        c = int(f.readline().strip())
         n = int(f.readline().strip())
-        
+        G = int(f.readline().strip())
+        capacity = int(f.readline().strip())
+        group_sizes = list(map(int, f.readline().strip().split()))
+
         items = []
         for _ in range(n):
-            l, p, g = map(int, f.readline().strip().split())
+            line = f.readline().strip()
+            if not line:
+                continue  # Pular linhas em branco
+            l, p, g = map(int, line.split())
             items.append((l, p, g))
-    
-    return c, n, items
+
+    return capacity, n, items
 
 def evaluate_solution(solution, items, capacity):
     total_weight = sum(items[i][1] for i in range(len(solution)) if solution[i])
@@ -59,7 +65,7 @@ def simulated_annealing(capacity, n, items, seed, max_iterations):
             current_value = evaluate_solution(current_solution, items, capacity)
             neighbor_value = evaluate_solution(neighbor, items, capacity)
             
-            if neighbor_value > current_value or random.uniform(0, 1) < pow(2.71828, (neighbor_value - current_value) / T):
+            if neighbor_value > current_value or random.uniform(0, 1) < math.exp((neighbor_value - current_value) / T):
                 current_solution = neighbor[:]
                 current_value = neighbor_value
                 
@@ -78,7 +84,7 @@ def simulated_annealing(capacity, n, items, seed, max_iterations):
 
 def main():
     if len(sys.argv) < 4:
-        print("Uso: python script.py <input_file> <seed> <max_iterations>")
+        print("Uso: python simulated_annealing.py <input_file> <seed> <max_iterations>")
         return
     
     input_file = sys.argv[1]
