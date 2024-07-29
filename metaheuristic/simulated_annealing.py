@@ -4,21 +4,28 @@ import time
 import math
 
 def parse_input_file(file_path):
+    instances = []
     with open(file_path, 'r') as f:
-        n = int(f.readline().strip())
-        G = int(f.readline().strip())
-        capacity = int(f.readline().strip())
-        group_sizes = list(map(int, f.readline().strip().split()))
-
-        items = []
-        for _ in range(n):
+        while True:
             line = f.readline().strip()
             if not line:
-                continue  # Pular linhas em branco
-            l, p, g = map(int, line.split())
-            items.append((l, p, g))
+                break
+            n = int(line)  # Número de itens
+            G = int(f.readline().strip())  # Número de grupos
+            capacity = int(f.readline().strip())  # Capacidade da mochila
+            group_sizes = list(map(int, f.readline().strip().split()))  # Tamanhos dos grupos
 
-    return capacity, n, items
+            items = []
+            for _ in range(n):
+                line = f.readline().strip()
+                if not line:
+                    continue  # Pular linhas em branco
+                l, p, g = map(int, line.split())
+                items.append((l, p, g))
+
+            instances.append((capacity, n, items))
+    
+    return instances
 
 def evaluate_solution(solution, items, capacity):
     total_weight = sum(items[i][1] for i in range(len(solution)) if solution[i])
@@ -57,7 +64,8 @@ def simulated_annealing(capacity, n, items, seed, max_iterations):
     alpha = 0.9
     
     start_time = time.time()
-    
+    init_time = time.time()
+
     while T > T_min and max_iterations > 0:
         i = 1
         while i <= 100:
@@ -79,7 +87,10 @@ def simulated_annealing(capacity, n, items, seed, max_iterations):
         
         T *= alpha
         max_iterations -= 1
-    
+        
+    end_time = time.time() - init_time
+    print(f"{end_time:.2f}s")
+
     return best_solution, best_value
 
 def main():
@@ -91,12 +102,14 @@ def main():
     seed = int(sys.argv[2])
     max_iterations = int(sys.argv[3])
     
-    capacity, n, items = parse_input_file(input_file)
+    instances = parse_input_file(input_file)
     
-    best_solution, best_value = simulated_annealing(capacity, n, items, seed, max_iterations)
-    
-    print(f"Best Solution: {best_solution}")
-    print(f"Best Value: {best_value}")
+    for idx, (capacity, n, items) in enumerate(instances):
+        print(f"Instance {idx+1}:")
+        best_solution, best_value = simulated_annealing(capacity, n, items, seed, max_iterations)
+        print(f"Best Solution: {best_solution}")
+        print(f"Best Value: {best_value}")
+        print("")
 
 if __name__ == "__main__":
     main()
