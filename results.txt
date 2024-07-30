@@ -1,0 +1,15 @@
+C50
+Tempo: 74591 ms
+Melhor solução: 1438.0
+
+F50
+Tempo: 74921 ms
+Melhor solução: 5804.0
+
+B50
+Tempo: 23658 ms
+Melhor solução: 730.0
+
+A50:
+Tempo: 19541 ms
+Melhor solução: 267.0
