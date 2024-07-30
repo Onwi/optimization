@@ -3,10 +3,8 @@ import random
 import time
 import math
 
-def parse_input_file(file_path):
-    """
-    Lê o arquivo de entrada e extrai as informações sobre os itens e as mochilas.
-    """
+def parse_input_file(file_path):  ## Lê o arquivo de entrada e extrai as informações sobre os itens e as mochilas.
+
     instances = []
     with open(file_path, 'r') as f:
         while True:
@@ -23,20 +21,18 @@ def parse_input_file(file_path):
                 line = f.readline().strip()
                 if line:
                     weight, profit, group = map(int, line.split())
-                    items.append((weight, profit, group))  # Adiciona o item (peso, lucro, grupo) à lista
+                    items.append((weight, profit, group))  # Adiciona o item (peso, lucro, grupo) na lista
 
             instances.append((max_capacity, num_items, items))
     
     return instances
 
-def evaluate_solution(solution, items, capacity):
-    """
-    Avalia a solução, verificando o lucro mínimo entre os grupos sem ultrapassar a capacidade da mochila.
-    """
+def evaluate_solution(solution, items, capacity): #Avaliamos a solução e verificamos o lucro mínimo entre os grupos sem ultrapassar a capacidade da mochila.
+
     total_weight = sum(items[i][1] for i in range(len(solution)) if solution[i])
     
     if total_weight > capacity:
-        return 0  # Solução inválida se o peso total exceder a capacidade
+        return 0  # Solução inválida (peso passou da mochila)
     
     group_profits = {}
     for i, included in enumerate(solution):
@@ -47,24 +43,20 @@ def evaluate_solution(solution, items, capacity):
             group_profits[group] += profit
     
     if not group_profits:
-        return 0  # Solução inválida se nenhum grupo foi incluído
+        return 0  # Solução inválida (nenhum grupo foi incluído)
     
     min_profit = min(group_profits.values())  # O lucro mínimo entre os grupos
     return min_profit
 
-def get_neighbor(solution):
-    """
-    Gera uma nova solução (vizinha) alterando aleatoriamente um item da solução atual.
-    """
+def get_neighbor(solution): # Gera uma nova solução (vizinha) alterando aleatoriamente a inclusão de um item da solução atual.
+    
     neighbor = solution[:]
     index = random.randint(0, len(solution) - 1)
-    neighbor[index] = 1 - neighbor[index]  # Alterna entre incluir e excluir o item
+    neighbor[index] = 1 - neighbor[index]  
     return neighbor
 
-def simulated_annealing(capacity, num_items, items, seed, max_iterations):
-    """
-    Algoritmo de Simulated Annealing para encontrar a melhor solução para o problema da mochila.
-    """
+def simulated_annealing(capacity, num_items, items, seed, max_iterations): # Algoritmo de Simulated Annealing para encontrar a melhor solução para o problema da mochila.
+
     random.seed(seed)
     current_solution = [random.randint(0, 1) for _ in range(num_items)]
     best_solution = current_solution[:]
@@ -82,7 +74,7 @@ def simulated_annealing(capacity, num_items, items, seed, max_iterations):
             current_value = evaluate_solution(current_solution, items, capacity)
             neighbor_value = evaluate_solution(neighbor, items, capacity)
             
-            # Se a solução vizinha for melhor ou passar no teste de probabilidade, adote-a
+            # Se a solução vizinha for melhor ou passar no teste de probabilidade, adotamos ela
             if (neighbor_value > current_value or 
                 random.uniform(0, 1) < math.exp((neighbor_value - current_value) / temperature)):
                 current_solution = neighbor[:]
